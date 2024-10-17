@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 const authAdmin = async (req, res, next) => {
 	try {
 		const { atoken } = req.headers;
+		// The atoken will be sent in the header of the request and it will be converted to a smaller case word so we used atoken instead of Atoken
 		if (!atoken) {
 			return res.json({
 				success: false,
