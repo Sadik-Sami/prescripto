@@ -1,13 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
 	const { token, setToken, backendUrl } = useContext(AppContext);
 	const [state, setState] = useState('Sign Up');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [name, setName] = useState('');
+	const navigate = useNavigate();
 	const onSubmitHandler = async (event) => {
 		event.preventDefault();
 		try {
@@ -43,6 +45,11 @@ const Login = () => {
 			toast.error(error.message);
 		}
 	};
+	useEffect(()=>{
+		if(token){
+			navigate('/');
+		}
+	},[token])
 
 	return (
 		<form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
