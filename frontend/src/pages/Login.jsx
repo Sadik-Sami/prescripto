@@ -1,16 +1,51 @@
-import React, { useState } from 'react';
-
+import React, { useContext, useState } from 'react';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 const Login = () => {
+	const { token, setToken, backendUrl } = useContext(AppContext);
 	const [state, setState] = useState('Sign Up');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [name, setName] = useState('');
 	const onSubmitHandler = async (event) => {
 		event.preventDefault();
+		try {
+			if (state === 'Sign Up') {
+				const { data } = await axios.post(`${backendUrl}/api/user/register`, {
+					name,
+					email,
+					password,
+				});
+				if (data.success) {
+					localStorage.setItem('token', data.token);
+					setToken(data.token);
+					toast.success('Account created successfully');
+				} else {
+					toast.error(data.message);
+				}
+			} else {
+				const { data } = await axios.post(`${backendUrl}/api/user/login`, {
+					name,
+					email,
+					password,
+				});
+				if (data.success) {
+					localStorage.setItem('token', data.token);
+					setToken(data.token);
+					toast.success('Login successful');
+				} else {
+					toast.error(data.message);
+				}
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error(error.message);
+		}
 	};
 
 	return (
-		<form className='min-h-[80vh] flex items-center'>
+		<form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
 			<div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
 				<p className='text-2xl font-semibold'>
 					{state === 'Sign Up' ? 'Create Account' : 'Login'}
@@ -52,7 +87,9 @@ const Login = () => {
 						required
 					/>
 				</div>
-				<button className='w-full bg-primary text-white rounded-md py-2 text-base'>
+				<button
+					type='submit'
+					className='w-full bg-primary text-white rounded-md py-2 text-base'>
 					{state === 'Sign Up' ? 'Create Account' : 'Login'}
 				</button>
 				{state === 'Sign Up' ? (
