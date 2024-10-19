@@ -43,6 +43,7 @@ const registerUser = async (req, res) => {
 		// _id is the unique identifier of the user
 
 		// creating token for the user
+		// and setting it as a jwt signed token inside an object witk key 'id'
 		const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 		res.json({
 			success: true,
@@ -51,7 +52,11 @@ const registerUser = async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		res.json({ success: false, message: error.code === 11000 ? 'Email already registered.' : error.message });
+		res.json({
+			success: false,
+			message:
+				error.code === 11000 ? 'Email already registered.' : error.message,
+		});
 	}
 };
 // API for user login
@@ -131,4 +136,15 @@ const loginUser = async (req, res) => {
 		res.json({ success: false, message: error.message });
 	}
 };
-export { registerUser, loginUser };
+// API to get user profile data
+const getProfile = async (req, res) => {
+	try {
+		const { userId } = req.body;
+		const userData = await userModel.findById(userId).select('-password');
+		res.json({ success: true, userData });
+	} catch (error) {
+		console.log(error);
+		res.json({ success: false, message: error.message });
+	}
+};
+export { registerUser, loginUser, getProfile };
